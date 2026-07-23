@@ -212,7 +212,7 @@
 
 <!-- ── MODAL NUEVO INGRESO ───────────────────────────── -->
 <div class="modal fade" id="modalReparacion" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content border-0 shadow">
             <form method="POST" action="<?= BASE_URL ?>/tecnicos/guardar" id="formReparacion">
                 <input type="hidden" name="veterinaria_id" value="<?= $veterinaria_id ?>">
