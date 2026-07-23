@@ -504,6 +504,18 @@ function initPatron() {
         c.setAttribute('data-num', d.num);
         c.classList.add('patron-dot');
         svg.appendChild(c);
+
+        const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        t.setAttribute('x', d.cx);
+        t.setAttribute('y', d.cy + 5);
+        t.setAttribute('text-anchor', 'middle');
+        t.setAttribute('font-size', '13');
+        t.setAttribute('font-weight', '700');
+        t.setAttribute('fill', '#fff');
+        t.setAttribute('pointer-events', 'none');
+        t.setAttribute('data-num', d.num);
+        t.classList.add('patron-orden');
+        svg.appendChild(t);
     });
 
     svg.addEventListener('pointerdown', e => {
@@ -543,6 +555,11 @@ function actualizarPatronVisual() {
     svg.querySelectorAll('.patron-dot').forEach(c => {
         const activo = patronSeleccion.includes(parseInt(c.dataset.num));
         c.setAttribute('fill', activo ? '#7c3aed' : '#e2e8f0');
+    });
+
+    svg.querySelectorAll('.patron-orden').forEach(t => {
+        const orden = patronSeleccion.indexOf(parseInt(t.dataset.num));
+        t.textContent = orden >= 0 ? orden + 1 : '';
     });
 
     const gLines = document.getElementById('patron-lines');
