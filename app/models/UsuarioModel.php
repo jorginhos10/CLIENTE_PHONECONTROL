@@ -58,7 +58,7 @@ class UsuarioModel {
 
     public function findById(int $id, int $cuenta_id): ?array {
         $stmt = $this->db->prepare(
-            'SELECT id, nombre, email, rol, activo, created_at FROM usuarios WHERE id = ? AND cuenta_id = ?'
+            'SELECT id, nombre, email, password, rol, activo, sucursal_id, created_at FROM usuarios WHERE id = ? AND cuenta_id = ?'
         );
         $stmt->bind_param('ii', $id, $cuenta_id);
         $stmt->execute();

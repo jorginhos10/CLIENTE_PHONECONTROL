@@ -35,6 +35,21 @@ switch ($uri) {
         (new DashboardController())->index();
         break;
 
+    case 'perfil':
+        require_once ROOT . '/app/controllers/PerfilController.php';
+        (new PerfilController())->index();
+        break;
+
+    case 'perfil/guardar':
+        require_once ROOT . '/app/controllers/PerfilController.php';
+        (new PerfilController())->guardar();
+        break;
+
+    case 'perfil/password':
+        require_once ROOT . '/app/controllers/PerfilController.php';
+        (new PerfilController())->password();
+        break;
+
     case 'almacen':
         require_once ROOT . '/app/controllers/AlmacenController.php';
         (new AlmacenController())->index();

@@ -159,7 +159,7 @@
                 </div>
 
                 <div class="col-sm-6 col-xl-4">
-                    <a class="cfg-item" href="#">
+                    <a class="cfg-item" href="<?= BASE_URL ?>/perfil">
                         <div class="cfg-item-icon bg-warning-soft">
                             <i class="bi bi-person-fill text-warning"></i>
                         </div>
