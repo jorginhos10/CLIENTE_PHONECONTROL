@@ -2,16 +2,19 @@
 
 require_once ROOT . '/app/models/ReparacionModel.php';
 require_once ROOT . '/app/models/VeterinariaModel.php';
+require_once ROOT . '/app/models/ClienteModel.php';
 
 class TecnicoController {
 
     private ReparacionModel  $model;
     private VeterinariaModel $vetModel;
+    private ClienteModel     $clienteModel;
 
     public function __construct() {
         $this->requiereAutenticacion();
-        $this->model    = new ReparacionModel();
-        $this->vetModel = new VeterinariaModel();
+        $this->model        = new ReparacionModel();
+        $this->vetModel     = new VeterinariaModel();
+        $this->clienteModel = new ClienteModel();
     }
 
     public function index(): void {
@@ -29,6 +32,7 @@ class TecnicoController {
             'veterinaria_id' => $veterinaria_id,
             'reparaciones'   => $this->model->getAll($veterinaria_id),
             'totales'        => $this->model->getTotales($veterinaria_id),
+            'clientes'       => $this->clienteModel->getAll($cuenta_id),
             'usuario'        => [
                 'nombre' => $_SESSION['usuario_nombre'],
                 'email'  => $_SESSION['usuario_email'],
@@ -47,31 +51,54 @@ class TecnicoController {
             $this->redirect('tecnicos');
         }
 
-        $cuenta_id       = (int)($_SESSION['cuenta_id'] ?? 0);
-        $veterinaria_id  = (int)($_POST['veterinaria_id'] ?? 0);
-        $cliente_nombre  = trim($_POST['cliente_nombre'] ?? '');
-        $cliente_telefono = trim($_POST['cliente_telefono'] ?? '');
-        $modelo          = trim($_POST['modelo'] ?? '');
-        $falla           = trim($_POST['falla'] ?? '');
+        $cuenta_id      = (int)($_SESSION['cuenta_id'] ?? 0);
+        $veterinaria_id = (int)($_POST['veterinaria_id'] ?? 0);
+        $cliente_id     = (int)($_POST['cliente_id'] ?? 0);
+        $marca          = trim($_POST['marca'] ?? '');
+        $modelo         = trim($_POST['modelo'] ?? '');
+        $falla          = trim($_POST['falla'] ?? '');
 
         if (!$this->vetModel->findById($veterinaria_id, $cuenta_id)) {
             $_SESSION['flash_error'] = 'Selecciona una sucursal válida.';
             $this->redirect('tecnicos');
         }
 
-        if (empty($cliente_nombre) || empty($modelo) || empty($falla)) {
-            $_SESSION['flash_error'] = 'Cliente, modelo y falla son obligatorios.';
+        $cliente = $this->clienteModel->findById($cliente_id, $cuenta_id);
+        if (!$cliente) {
+            $_SESSION['flash_error'] = 'Selecciona un cliente válido de la lista.';
             $this->redirect('tecnicos');
         }
 
+        if (empty($marca) || empty($modelo) || empty($falla)) {
+            $_SESSION['flash_error'] = 'Fabricante, modelo y falla son obligatorios.';
+            $this->redirect('tecnicos');
+        }
+
+        $accesorios = implode(',', array_filter((array)($_POST['accesorios'] ?? [])));
+        $fechaEntrega = trim($_POST['fecha_entrega_estimada'] ?? '');
+
         $ok = $this->model->crear([
-            'cuenta_id'        => $cuenta_id,
-            'veterinaria_id'   => $veterinaria_id,
-            'cliente_nombre'   => $cliente_nombre,
-            'cliente_telefono' => $cliente_telefono,
-            'modelo'           => $modelo,
-            'falla'            => $falla,
-            'usuario_id'       => (int)($_SESSION['usuario_id'] ?? 0),
+            'cuenta_id'              => $cuenta_id,
+            'veterinaria_id'         => $veterinaria_id,
+            'cliente_id'             => $cliente_id,
+            'cliente_nombre'         => trim($cliente['nombre'] . ' ' . $cliente['apellido']),
+            'cliente_telefono'       => $cliente['telefono'] ?? '',
+            'tipo_equipo'            => trim($_POST['tipo_equipo'] ?? ''),
+            'marca'                  => $marca,
+            'modelo'                 => $modelo,
+            'color'                  => trim($_POST['color'] ?? ''),
+            'serial'                 => trim($_POST['serial'] ?? ''),
+            'clave_equipo'           => trim($_POST['clave_equipo'] ?? ''),
+            'falla'                  => $falla,
+            'observaciones'          => trim($_POST['observaciones'] ?? ''),
+            'accesorios'             => $accesorios,
+            'costo_total'            => (float)($_POST['costo_total'] ?? 0),
+            'abono'                  => (float)($_POST['abono'] ?? 0),
+            'descuento'              => (float)($_POST['descuento'] ?? 0),
+            'referencia_pago'        => trim($_POST['referencia_pago'] ?? ''),
+            'fecha_entrega_estimada' => $fechaEntrega !== '' ? $fechaEntrega : null,
+            'dias_garantia'          => (int)($_POST['dias_garantia'] ?? 30),
+            'usuario_id'             => (int)($_SESSION['usuario_id'] ?? 0),
         ]);
 
         $_SESSION[$ok ? 'flash_success' : 'flash_error'] = $ok

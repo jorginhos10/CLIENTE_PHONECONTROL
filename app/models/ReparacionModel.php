@@ -44,12 +44,20 @@ class ReparacionModel {
 
     public function crear(array $d): bool {
         $stmt = $this->db->prepare(
-            'INSERT INTO reparaciones (cuenta_id, veterinaria_id, cliente_nombre, cliente_telefono, modelo, falla, usuario_id)
-             VALUES (?, ?, ?, ?, ?, ?, ?)'
+            'INSERT INTO reparaciones (
+                cuenta_id, veterinaria_id, cliente_id, cliente_nombre, cliente_telefono,
+                tipo_equipo, marca, modelo, color, serial, clave_equipo,
+                falla, observaciones, accesorios,
+                costo_total, abono, descuento, referencia_pago, fecha_entrega_estimada, dias_garantia,
+                usuario_id
+             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
         );
-        $stmt->bind_param('iissssi',
-            $d['cuenta_id'], $d['veterinaria_id'], $d['cliente_nombre'],
-            $d['cliente_telefono'], $d['modelo'], $d['falla'], $d['usuario_id']
+        $stmt->bind_param('iiisssssssssssdddssii',
+            $d['cuenta_id'], $d['veterinaria_id'], $d['cliente_id'], $d['cliente_nombre'], $d['cliente_telefono'],
+            $d['tipo_equipo'], $d['marca'], $d['modelo'], $d['color'], $d['serial'], $d['clave_equipo'],
+            $d['falla'], $d['observaciones'], $d['accesorios'],
+            $d['costo_total'], $d['abono'], $d['descuento'], $d['referencia_pago'], $d['fecha_entrega_estimada'], $d['dias_garantia'],
+            $d['usuario_id']
         );
         $ok = $stmt->execute();
         $stmt->close();

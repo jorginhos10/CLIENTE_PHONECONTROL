@@ -118,7 +118,7 @@
                                 <tr>
                                     <th class="ps-3">#</th>
                                     <th>Cliente</th>
-                                    <th>Modelo</th>
+                                    <th>Equipo</th>
                                     <th>Falla reportada</th>
                                     <th class="text-center">Estado</th>
                                     <th class="text-center">Fecha</th>
@@ -143,7 +143,12 @@
                                         <div class="text-muted small"><?= htmlspecialchars($r['cliente_telefono']) ?></div>
                                         <?php endif; ?>
                                     </td>
-                                    <td><?= htmlspecialchars($r['modelo']) ?></td>
+                                    <td>
+                                        <div><?= htmlspecialchars($r['marca'] . ' ' . $r['modelo']) ?></div>
+                                        <?php if (!empty($r['tipo_equipo'])): ?>
+                                        <div class="text-muted small"><?= htmlspecialchars($r['tipo_equipo']) ?></div>
+                                        <?php endif; ?>
+                                    </td>
                                     <td class="text-muted small" style="max-width:220px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
                                         <?= htmlspecialchars($r['falla']) ?>
                                     </td>
@@ -207,7 +212,7 @@
 
 <!-- ── MODAL NUEVO INGRESO ───────────────────────────── -->
 <div class="modal fade" id="modalReparacion" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content border-0 shadow">
             <form method="POST" action="<?= BASE_URL ?>/tecnicos/guardar" id="formReparacion">
                 <input type="hidden" name="veterinaria_id" value="<?= $veterinaria_id ?>">
@@ -221,32 +226,160 @@
                 </div>
 
                 <div class="modal-body pt-3">
-                    <div class="row g-3">
 
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Cliente <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="cliente_nombre" placeholder="Nombre del cliente" required>
+                    <!-- Cliente -->
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <i class="bi bi-person-fill text-primary"></i>
+                        <span class="fw-semibold small text-uppercase text-muted" style="letter-spacing:.05em;">Propietario del equipo</span>
+                    </div>
+                    <div class="row g-3 mb-3 pb-3 border-bottom">
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Selecciona el cliente <span class="text-danger">*</span></label>
+                            <select class="form-select" name="cliente_id" required>
+                                <option value="">Busca un cliente registrado…</option>
+                                <?php foreach ($clientes as $c): ?>
+                                <option value="<?= $c['id'] ?>">
+                                    <?= htmlspecialchars($c['nombre'] . ' ' . $c['apellido']) ?><?= $c['telefono'] ? ' — ' . htmlspecialchars($c['telefono']) : '' ?>
+                                </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <div class="form-text">
+                                ¿No está en la lista? <a href="<?= BASE_URL ?>/clientes">Regístralo primero en Clientes</a>.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Equipo -->
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <i class="bi bi-phone text-primary"></i>
+                        <span class="fw-semibold small text-uppercase text-muted" style="letter-spacing:.05em;">Información del dispositivo</span>
+                    </div>
+                    <div class="row g-3 mb-3 pb-3 border-bottom">
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Categoría del dispositivo</label>
+                            <input type="text" class="form-control" name="tipo_equipo" placeholder="Ej: Celular, Tablet, Consola…">
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">Teléfono</label>
+                            <label class="form-label fw-semibold">Fabricante <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="marca" placeholder="Ej: Samsung, Apple…" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Modelo del equipo <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="modelo" placeholder="Ej: Galaxy A54, iPhone 15…" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Color del equipo</label>
+                            <input type="text" class="form-control" name="color" placeholder="Ej: Negro, Blanco…">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">IMEI / N.º de serie</label>
+                            <input type="text" class="form-control" name="serial" placeholder="Identificador del equipo">
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Clave o patrón de desbloqueo</label>
                             <div class="input-group">
-                                <span class="input-group-text"><i class="bi bi-telephone"></i></span>
-                                <input type="tel" class="form-control" name="cliente_telefono" placeholder="Ej: 555-1234">
+                                <input type="password" class="form-control" name="clave_equipo" id="inp-clave-equipo" placeholder="PIN o contraseña alfanumérica">
+                                <button type="button" class="btn btn-outline-secondary" onclick="mostrarClave()">
+                                    <i class="bi bi-eye" id="icono-clave"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Falla y notas -->
+                    <div class="row g-3 mb-3 pb-3 border-bottom">
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Falla reportada por el cliente <span class="text-danger">*</span></label>
+                            <textarea class="form-control" name="falla" rows="2" placeholder="Describe el problema tal como lo cuenta el cliente…" required></textarea>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Notas internas para el técnico</label>
+                            <textarea class="form-control" name="observaciones" rows="2" placeholder="Daños previos, piezas faltantes, detalles solo visibles para el taller…"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Accesorios -->
+                    <div class="mb-3 pb-3 border-bottom">
+                        <label class="form-label fw-semibold d-block">Accesorios entregados</label>
+                        <div class="d-flex flex-wrap gap-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="accesorios[]" value="Chip" id="acc-chip">
+                                <label class="form-check-label" for="acc-chip">Chip</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="accesorios[]" value="Memoria" id="acc-memoria">
+                                <label class="form-check-label" for="acc-memoria">Memoria</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="accesorios[]" value="Cargador" id="acc-cargador">
+                                <label class="form-check-label" for="acc-cargador">Cargador</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="accesorios[]" value="Forro" id="acc-forro">
+                                <label class="form-check-label" for="acc-forro">Forro</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Finanzas -->
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <i class="bi bi-cash-coin text-primary"></i>
+                        <span class="fw-semibold small text-uppercase text-muted" style="letter-spacing:.05em;">Costos y pagos</span>
+                    </div>
+                    <div class="row g-3 mb-3 pb-3 border-bottom">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Valor total de la reparación</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" name="costo_total" id="inp-costo-total" step="0.01" min="0" placeholder="0.00" oninput="calcularSaldo()">
                             </div>
                         </div>
 
-                        <div class="col-12">
-                            <label class="form-label fw-semibold">Modelo del celular <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="modelo" placeholder="Ej: Samsung Galaxy A54" required>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Adelanto recibido</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" name="abono" id="inp-abono" step="0.01" min="0" placeholder="0.00" oninput="calcularSaldo()">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Referencia de pago</label>
+                            <input type="text" class="form-control" name="referencia_pago" placeholder="Ej: Ref. transferencia #…">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Descuento aplicado</label>
+                            <div class="input-group">
+                                <span class="input-group-text">%</span>
+                                <input type="number" class="form-control" name="descuento" id="inp-descuento" step="0.01" min="0" placeholder="0.00" oninput="calcularSaldo()">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Fecha estimada de entrega</label>
+                            <input type="date" class="form-control" name="fecha_entrega_estimada">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Garantía del servicio (días)</label>
+                            <input type="number" class="form-control" name="dias_garantia" min="0" value="30">
                         </div>
 
                         <div class="col-12">
-                            <label class="form-label fw-semibold">Falla reportada <span class="text-danger">*</span></label>
-                            <textarea class="form-control" name="falla" rows="3" placeholder="Ej: No enciende, pantalla rota…" required></textarea>
+                            <div class="alert alert-light border py-2 px-3 mb-0 d-flex justify-content-between align-items-center">
+                                <span class="text-muted small">Saldo por cobrar</span>
+                                <span class="fw-bold" id="lbl-saldo">$0.00</span>
+                            </div>
                         </div>
-
                     </div>
+
                 </div>
 
                 <div class="modal-footer border-0 pt-0">
@@ -269,6 +402,27 @@ document.getElementById('buscador').addEventListener('input', function () {
         tr.style.display = tr.textContent.toLowerCase().includes(q) ? '' : 'none';
     });
 });
+
+function mostrarClave() {
+    const inp  = document.getElementById('inp-clave-equipo');
+    const icon = document.getElementById('icono-clave');
+    if (inp.type === 'password') {
+        inp.type = 'text';
+        icon.className = 'bi bi-eye-slash';
+    } else {
+        inp.type = 'password';
+        icon.className = 'bi bi-eye';
+    }
+}
+
+function calcularSaldo() {
+    const costo     = parseFloat(document.getElementById('inp-costo-total').value) || 0;
+    const abono     = parseFloat(document.getElementById('inp-abono').value)       || 0;
+    const descuento = parseFloat(document.getElementById('inp-descuento').value)   || 0;
+    const montoDescuento = costo * (descuento / 100);
+    const saldo = Math.max(0, costo - montoDescuento - abono);
+    document.getElementById('lbl-saldo').textContent = '$' + saldo.toFixed(2);
+}
 </script>
 </body>
 </html>
