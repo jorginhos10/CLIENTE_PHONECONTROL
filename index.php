@@ -25,6 +25,11 @@ switch ($uri) {
         (new AuthController())->registro();
         break;
 
+    case 'seguimiento':
+        require_once ROOT . '/app/controllers/SeguimientoController.php';
+        (new SeguimientoController())->ver();
+        break;
+
     case 'dashboard':
         require_once ROOT . '/app/controllers/DashboardController.php';
         (new DashboardController())->index();

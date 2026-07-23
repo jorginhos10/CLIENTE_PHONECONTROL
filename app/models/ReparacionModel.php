@@ -43,17 +43,19 @@ class ReparacionModel {
     }
 
     public function crear(array $d): bool {
+        $token = bin2hex(random_bytes(20));
+
         $stmt = $this->db->prepare(
             'INSERT INTO reparaciones (
-                cuenta_id, veterinaria_id, cliente_id, cliente_nombre, cliente_telefono,
+                token, cuenta_id, veterinaria_id, cliente_id, cliente_nombre, cliente_telefono,
                 tipo_equipo, marca, modelo, color, serial, clave_equipo,
                 falla, observaciones, accesorios,
                 costo_total, abono, descuento, referencia_pago, fecha_entrega_estimada, dias_garantia,
                 usuario_id
-             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
         );
-        $stmt->bind_param('iiisssssssssssdddssii',
-            $d['cuenta_id'], $d['veterinaria_id'], $d['cliente_id'], $d['cliente_nombre'], $d['cliente_telefono'],
+        $stmt->bind_param('siiisssssssssssdddssii',
+            $token, $d['cuenta_id'], $d['veterinaria_id'], $d['cliente_id'], $d['cliente_nombre'], $d['cliente_telefono'],
             $d['tipo_equipo'], $d['marca'], $d['modelo'], $d['color'], $d['serial'], $d['clave_equipo'],
             $d['falla'], $d['observaciones'], $d['accesorios'],
             $d['costo_total'], $d['abono'], $d['descuento'], $d['referencia_pago'], $d['fecha_entrega_estimada'], $d['dias_garantia'],
@@ -62,6 +64,15 @@ class ReparacionModel {
         $ok = $stmt->execute();
         $stmt->close();
         return $ok;
+    }
+
+    public function findByToken(string $token): ?array {
+        $stmt = $this->db->prepare('SELECT * FROM reparaciones WHERE token = ?');
+        $stmt->bind_param('s', $token);
+        $stmt->execute();
+        $row = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+        return $row ?: null;
     }
 
     public function siguienteEstado(string $estado): ?string {

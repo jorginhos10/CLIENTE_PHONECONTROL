@@ -171,6 +171,21 @@
                                     </td>
                                     <td class="text-center">
                                         <div class="d-flex justify-content-center gap-1">
+                                            <?php if (!empty($r['token'])): ?>
+                                            <a href="<?= BASE_URL ?>/seguimiento?token=<?= urlencode($r['token']) ?>"
+                                               target="_blank" rel="noopener"
+                                               class="btn btn-sm btn-outline-primary btn-accion" title="Ver seguimiento del cliente">
+                                                <i class="bi bi-eye-fill"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary btn-accion" title="Copiar enlace para el cliente"
+                                                    onclick="copiarSeguimiento('<?= BASE_URL ?>/seguimiento?token=<?= $r['token'] ?>', this)">
+                                                <i class="bi bi-link-45deg"></i>
+                                            </button>
+                                            <?php else: ?>
+                                            <span class="btn btn-sm btn-outline-secondary btn-accion disabled" title="No disponible para registros anteriores a esta función">
+                                                <i class="bi bi-eye-slash"></i>
+                                            </span>
+                                            <?php endif; ?>
                                             <?php
                                             $siguientes = [
                                                 'pendiente'     => ['tools',      'btn-outline-info',      'Iniciar reparación'],
@@ -220,6 +235,16 @@ document.getElementById('buscador').addEventListener('input', function () {
         tr.style.display = tr.textContent.toLowerCase().includes(q) ? '' : 'none';
     });
 });
+
+function copiarSeguimiento(url, btn) {
+    if (url.startsWith('/')) url = location.origin + url;
+    navigator.clipboard.writeText(url).then(() => {
+        const icon = btn.querySelector('i');
+        const original = icon.className;
+        icon.className = 'bi bi-check-lg text-success';
+        setTimeout(() => { icon.className = original; }, 1500);
+    });
+}
 
 </script>
 </body>
