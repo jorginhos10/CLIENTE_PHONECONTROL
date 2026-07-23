@@ -100,7 +100,7 @@
                         </div>
                         <div>
                             <div class="cfg-item-title">General</div>
-                            <p class="cfg-item-desc">Sucursales y datos de la clínica</p>
+                            <p class="cfg-item-desc">Nombre y datos generales del negocio</p>
                         </div>
                         <i class="bi bi-chevron-right cfg-item-arrow"></i>
                     </a>

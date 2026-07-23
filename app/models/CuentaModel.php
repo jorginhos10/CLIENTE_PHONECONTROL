@@ -56,4 +56,12 @@ class CuentaModel {
         $stmt->close();
         return $row ?: null;
     }
+
+    public function actualizar(int $id, string $nombre): bool {
+        $stmt = $this->db->prepare('UPDATE cuentas SET nombre = ? WHERE id = ?');
+        $stmt->bind_param('si', $nombre, $id);
+        $ok = $stmt->execute();
+        $stmt->close();
+        return $ok;
+    }
 }

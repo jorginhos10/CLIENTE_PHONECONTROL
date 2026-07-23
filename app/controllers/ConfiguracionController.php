@@ -1,14 +1,17 @@
 <?php
 
 require_once ROOT . '/app/models/VeterinariaModel.php';
+require_once ROOT . '/app/models/CuentaModel.php';
 
 class ConfiguracionController {
 
     private VeterinariaModel $vetModel;
+    private CuentaModel      $cuentaModel;
 
     public function __construct() {
         $this->requiereAutenticacion();
-        $this->vetModel = new VeterinariaModel();
+        $this->vetModel    = new VeterinariaModel();
+        $this->cuentaModel = new CuentaModel();
     }
 
     public function index(): void {
@@ -36,6 +39,47 @@ class ConfiguracionController {
         unset($_SESSION['flash_success'], $_SESSION['flash_error'], $_SESSION['flash_tab']);
 
         $this->render('configuracion/index', $datos);
+    }
+
+    public function general(): void {
+        $cuenta_id = (int)($_SESSION['cuenta_id'] ?? 0);
+        $cuenta    = $this->cuentaModel->findById($cuenta_id);
+
+        $datos = [
+            'activePage' => 'configuracion',
+            'cuenta'     => $cuenta,
+            'usuario'    => [
+                'nombre' => $_SESSION['usuario_nombre'],
+                'email'  => $_SESSION['usuario_email'],
+                'rol'    => $_SESSION['usuario_rol'],
+            ],
+            'success' => $_SESSION['flash_success'] ?? '',
+            'error'   => $_SESSION['flash_error']   ?? '',
+        ];
+        unset($_SESSION['flash_success'], $_SESSION['flash_error']);
+
+        $this->render('configuracion/general', $datos);
+    }
+
+    public function guardarGeneral(): void {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('configuracion/general');
+        }
+
+        $cuenta_id = (int)($_SESSION['cuenta_id'] ?? 0);
+        $nombre    = trim($_POST['nombre'] ?? '');
+
+        if (empty($nombre)) {
+            $_SESSION['flash_error'] = 'El nombre del negocio es obligatorio.';
+            $this->redirect('configuracion/general');
+        }
+
+        $ok = $this->cuentaModel->actualizar($cuenta_id, $nombre);
+        $_SESSION[$ok ? 'flash_success' : 'flash_error'] = $ok
+            ? 'Datos generales actualizados correctamente.'
+            : 'Error al actualizar los datos generales.';
+
+        $this->redirect('configuracion/general');
     }
 
     public function sucursales(): void {

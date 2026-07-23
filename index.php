@@ -185,6 +185,16 @@ switch ($uri) {
         (new ConfiguracionController())->index();
         break;
 
+    case 'configuracion/general':
+        require_once ROOT . '/app/controllers/ConfiguracionController.php';
+        (new ConfiguracionController())->general();
+        break;
+
+    case 'configuracion/general/guardar':
+        require_once ROOT . '/app/controllers/ConfiguracionController.php';
+        (new ConfiguracionController())->guardarGeneral();
+        break;
+
     case 'configuracion/sucursales':
         require_once ROOT . '/app/controllers/ConfiguracionController.php';
         (new ConfiguracionController())->sucursales();
