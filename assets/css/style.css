@@ -900,39 +900,63 @@
     word-break: break-word;
 }
 
-/* ── MODAL REPARACIÓN (Técnico) ─────────────────────── */
-/* Manejo 100% propio del alto/scroll (sin depender de la clase
-   modal-dialog-scrollable de Bootstrap, que en algunos entornos no
-   terminaba de acotar el alto real). .modal-dialog usa flex para que
-   .modal-content pueda encogerse con min-height:0 (necesario en
-   flexbox para que un hijo con overflow:auto realmente scrollee en
-   vez de crecer con el contenido). */
-#modalReparacion .modal-dialog {
+/* ── PANEL NUEVO INGRESO (Técnico) ────────────────────── */
+/* Overlay propio (no usa .modal de Bootstrap): así el alto/scroll
+   no depende de ninguna clase o cálculo interno de terceros. */
+.rep-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1060;
+    background: rgba(15, 23, 42, .55);
+    padding: 2rem 1rem;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+.rep-overlay.show {
     display: flex;
     align-items: flex-start;
-    min-height: calc(100vh - 3.5rem);
-    margin-top: 1.75rem;
-    margin-bottom: 1.75rem;
+    justify-content: center;
 }
 
-#modalReparacion .modal-content {
+.rep-panel {
+    background: #fff;
+    border-radius: 1rem;
     width: 100%;
-    max-height: calc(100vh - 3.5rem);
-    overflow: hidden;
+    max-width: 700px;
+    max-height: calc(100vh - 4rem);
     display: flex;
     flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, .3);
 }
 
-#modalReparacion .modal-body {
+.rep-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.5rem;
+    flex-shrink: 0;
+    background: #fff;
+}
+
+.rep-panel-footer {
+    padding: 1rem 1.5rem;
+    flex-shrink: 0;
+    background: #fff;
+    border-top: 1px solid #eef1f6;
+    display: flex;
+    justify-content: flex-end;
+    gap: .5rem;
+}
+
+.rep-panel-body {
+    padding: 1.25rem 1.5rem;
     overflow-y: auto;
     flex: 1 1 0%;
     min-height: 0;
     background: #f8fafc;
-}
-
-#modalReparacion .modal-header,
-#modalReparacion .modal-footer {
-    background: #fff;
 }
 
 /* Secciones tipo tarjeta dentro del formulario */

@@ -25,7 +25,7 @@
                 <!-- Veterinaria -->
                 <?php require ROOT . '/app/views/layouts/vet_selector.php'; ?>
 
-                <button class="btn btn-primary-custom btn-sm" data-bs-toggle="modal" data-bs-target="#modalReparacion">
+                <button class="btn btn-primary-custom btn-sm" onclick="abrirModalReparacion()">
                     <i class="bi bi-phone-fill me-1"></i> Nuevo ingreso
                 </button>
 
@@ -210,22 +210,21 @@
     </div>
 </div>
 
-<!-- ── MODAL NUEVO INGRESO ───────────────────────────── -->
-<div class="modal fade" id="modalReparacion" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content border-0 shadow">
-            <form method="POST" action="<?= BASE_URL ?>/tecnicos/guardar" id="formReparacion">
-                <input type="hidden" name="veterinaria_id" value="<?= $veterinaria_id ?>">
+<!-- ── PANEL NUEVO INGRESO (overlay propio, sin bootstrap .modal) ── -->
+<div class="rep-overlay" id="modalReparacion" onclick="if (event.target === this) cerrarModalReparacion()">
+    <div class="rep-panel">
+        <form method="POST" action="<?= BASE_URL ?>/tecnicos/guardar" id="formReparacion">
+            <input type="hidden" name="veterinaria_id" value="<?= $veterinaria_id ?>">
 
-                <div class="modal-header border-0">
-                    <h5 class="modal-title fw-bold d-flex align-items-center gap-2">
-                        <span class="form-section-icon bg-primary-soft text-primary"><i class="bi bi-phone-fill"></i></span>
-                        Nuevo ingreso a reparación
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
+            <div class="rep-panel-header">
+                <h5 class="fw-bold d-flex align-items-center gap-2 mb-0">
+                    <span class="form-section-icon bg-primary-soft text-primary"><i class="bi bi-phone-fill"></i></span>
+                    Nuevo ingreso a reparación
+                </h5>
+                <button type="button" class="btn-close" onclick="cerrarModalReparacion()"></button>
+            </div>
 
-                <div class="modal-body">
+            <div class="rep-panel-body">
 
                     <!-- Cliente -->
                     <div class="form-section">
@@ -436,16 +435,15 @@
                         </div>
                     </div>
 
-                </div>
+            </div>
 
-                <div class="modal-footer" style="border-top:1px solid #eef1f6;">
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary-custom">
-                        <i class="bi bi-save me-1"></i> Registrar ingreso
-                    </button>
-                </div>
-            </form>
-        </div>
+            <div class="rep-panel-footer">
+                <button type="button" class="btn btn-light" onclick="cerrarModalReparacion()">Cancelar</button>
+                <button type="submit" class="btn btn-primary-custom">
+                    <i class="bi bi-save me-1"></i> Registrar ingreso
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -623,11 +621,27 @@ function limpiarPatron() {
     guardarPatron();
 }
 
-document.getElementById('modalReparacion')?.addEventListener('show.bs.modal', () => {
+// ── Abrir / cerrar panel (overlay propio, sin bootstrap .modal) ──
+function abrirModalReparacion() {
     document.getElementById('inp-clave-texto').value = '';
     limpiarPatron();
     cambiarModoClave('texto');
+    document.getElementById('modalReparacion').classList.add('show');
+    document.body.style.overflow = 'hidden';
+}
+
+function cerrarModalReparacion() {
+    document.getElementById('modalReparacion').classList.remove('show');
+    document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') cerrarModalReparacion();
 });
+
+<?php if (!empty($error)): ?>
+abrirModalReparacion();
+<?php endif; ?>
 
 function calcularSaldo() {
     const costo     = parseFloat(document.getElementById('inp-costo-total').value) || 0;
