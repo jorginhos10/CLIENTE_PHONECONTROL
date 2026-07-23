@@ -11,7 +11,7 @@ $veterinaria_id = $veterinaria_id ?? 0;
         <div class="sidebar-brand-icon">
             <i class="bi bi-shop"></i>
         </div>
-        <span class="sidebar-brand-name">StoreControl</span>
+        <span class="sidebar-brand-name">PhoneControl</span>
     </div>
 
     <!-- Navegación -->
@@ -174,7 +174,7 @@ document.addEventListener('DOMContentLoaded', function () {
             html: '¿Está seguro que desea cambiar a <b>' + vetName + '</b>?',
             icon: 'question',
             showCancelButton: true,
-            confirmButtonColor: '#4f46e5',
+            confirmButtonColor: '#16a34a',
             cancelButtonColor:  '#6c757d',
             confirmButtonText:  'Sí, cambiar',
             cancelButtonText:   'Cancelar',

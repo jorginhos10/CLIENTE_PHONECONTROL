@@ -169,7 +169,7 @@
         <div class="rpt-logo">
             <div class="rpt-logo-icon">&#128722;</div>
             <div>
-                <div class="rpt-logo-name">StoreControl</div>
+                <div class="rpt-logo-name">PhoneControl</div>
                 <div class="rpt-logo-sub">Sistema de punto de venta</div>
             </div>
         </div>
@@ -290,7 +290,7 @@
 
     <!-- Pie -->
     <div class="rpt-footer">
-        <span>StoreControl &mdash; <?= htmlspecialchars($sucursal_nombre) ?></span>
+        <span>PhoneControl &mdash; <?= htmlspecialchars($sucursal_nombre) ?></span>
         <span>Reporte generado el <?= date('d/m/Y \a \l\a\s H:i') ?></span>
     </div>
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StoreControl &mdash; Iniciar Sesión</title>
+    <title>PhoneControl &mdash; Iniciar Sesión</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <link href="<?= BASE_URL ?>/assets/css/style.css" rel="stylesheet">
@@ -18,7 +18,7 @@
             <div class="brand-logo">
                 <i class="bi bi-shop"></i>
             </div>
-            <h1 class="brand-name">StoreControl</h1>
+            <h1 class="brand-name">PhoneControl</h1>
             <p class="brand-desc">Sistema de punto de venta integral para la gestión de tu tienda.</p>
             <ul class="feature-list">
                 <li><i class="bi bi-check2-circle"></i> Registro rápido de ventas</li>
@@ -44,7 +44,7 @@
                 <div class="brand-logo-sm">
                     <i class="bi bi-shop"></i>
                 </div>
-                <h2 class="mt-2 fw-bold" style="color: var(--primary);">StoreControl</h2>
+                <h2 class="mt-2 fw-bold" style="color: var(--primary);">PhoneControl</h2>
             </div>
 
             <h3 class="login-title">Bienvenido de vuelta</h3>
@@ -139,7 +139,7 @@
             </div>
 
             <p class="text-center text-muted mt-4 mb-0" style="font-size: .75rem;">
-                &copy; <?= date('Y') ?> StoreControl. Todos los derechos reservados.
+                &copy; <?= date('Y') ?> PhoneControl. Todos los derechos reservados.
             </p>
 
         </div>

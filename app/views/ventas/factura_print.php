@@ -104,7 +104,7 @@
         <div class="rpt-logo">
             <div class="rpt-logo-icon">&#128722;</div>
             <div>
-                <div class="rpt-logo-name">StoreControl</div>
+                <div class="rpt-logo-name">PhoneControl</div>
                 <div class="rpt-logo-sub">Sistema de punto de venta</div>
             </div>
         </div>
@@ -197,7 +197,7 @@
     <?php endif; ?>
 
     <div class="rpt-footer">
-        <span>StoreControl &mdash; <?= htmlspecialchars($venta['veterinaria_nombre']) ?></span>
+        <span>PhoneControl &mdash; <?= htmlspecialchars($venta['veterinaria_nombre']) ?></span>
         <span>Documento generado el <?= date('d/m/Y \a \l\a\s H:i') ?></span>
     </div>
 

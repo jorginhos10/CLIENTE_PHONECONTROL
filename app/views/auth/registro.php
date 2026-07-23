@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StoreControl &mdash; Crear cuenta</title>
+    <title>PhoneControl &mdash; Crear cuenta</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <link href="<?= BASE_URL ?>/assets/css/style.css" rel="stylesheet">
@@ -18,7 +18,7 @@
             <div class="brand-logo">
                 <i class="bi bi-shop"></i>
             </div>
-            <h1 class="brand-name">StoreControl</h1>
+            <h1 class="brand-name">PhoneControl</h1>
             <p class="brand-desc">Crea tu cuenta y arranca tu propio negocio en minutos.</p>
             <ul class="feature-list">
                 <li><i class="bi bi-check2-circle"></i> Tu cuenta, tus comercios y tus datos, independientes</li>
@@ -44,11 +44,11 @@
                 <div class="brand-logo-sm">
                     <i class="bi bi-shop"></i>
                 </div>
-                <h2 class="mt-2 fw-bold" style="color: var(--primary);">StoreControl</h2>
+                <h2 class="mt-2 fw-bold" style="color: var(--primary);">PhoneControl</h2>
             </div>
 
             <h3 class="login-title">Crea tu cuenta</h3>
-            <p class="login-subtitle">Registra tu negocio para empezar a usar StoreControl</p>
+            <p class="login-subtitle">Registra tu negocio para empezar a usar PhoneControl</p>
 
             <!-- Alerta de error -->
             <?php if (!empty($error)): ?>
@@ -156,7 +156,7 @@
             </p>
 
             <p class="text-center text-muted mt-4 mb-0" style="font-size: .75rem;">
-                &copy; <?= date('Y') ?> StoreControl. Todos los derechos reservados.
+                &copy; <?= date('Y') ?> PhoneControl. Todos los derechos reservados.
             </p>
 
         </div>
