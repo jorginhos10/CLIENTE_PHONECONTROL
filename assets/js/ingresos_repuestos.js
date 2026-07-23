@@ -1,0 +1,191 @@
+// Buscador en tabla principal
+document.getElementById('buscador')?.addEventListener('input', function () {
+    const q = this.value.toLowerCase();
+    document.querySelectorAll('#tablaIngresos tbody tr').forEach(tr => {
+        tr.style.display = tr.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+});
+
+// ── LÍNEAS DE REPUESTOS ──────────────────────────────
+
+let lineaIdx = 0;
+
+function agregarLinea() {
+    const body = document.getElementById('lineasBody');
+    const idx  = lineaIdx++;
+
+    const div = document.createElement('div');
+    div.className = 'linea-row';
+    div.id = `linea-${idx}`;
+    div.innerHTML = `
+        <div class="linea-col linea-col-producto">
+            <label class="linea-lbl d-md-none">Repuesto</label>
+            <div class="prod-ac" id="ac-${idx}">
+                <input type="text" class="form-control form-control-sm prod-ac-input"
+                       placeholder="Buscar repuesto…" autocomplete="off">
+                <input type="hidden" name="producto_id[]" class="prod-ac-value" required>
+                <div class="prod-ac-list"></div>
+            </div>
+        </div>
+        <div class="linea-col linea-col-cant">
+            <label class="linea-lbl d-md-none">Cantidad</label>
+            <div class="input-group input-group-sm">
+                <input type="number" class="form-control text-center" name="cantidad[]"
+                       id="cant-${idx}" min="1" value="1"
+                       oninput="recalcularLinea(${idx})" required>
+                <span class="input-group-text px-2" id="unidad-${idx}" style="font-size:.72rem;min-width:36px;">u.</span>
+            </div>
+        </div>
+        <div class="linea-col linea-col-precio">
+            <label class="linea-lbl d-md-none">P. Unitario</label>
+            <div class="input-group input-group-sm">
+                <span class="input-group-text px-2">$</span>
+                <input type="number" class="form-control bg-light" name="precio_unitario[]"
+                       id="precio-${idx}" step="0.01" min="0" value="0.00"
+                       readonly title="Se completa automáticamente desde el precio de venta del repuesto">
+            </div>
+        </div>
+        <div class="linea-col linea-col-sub">
+            <label class="linea-lbl d-md-none">Subtotal</label>
+            <div class="linea-subtotal" id="sub-${idx}">$0.00</div>
+        </div>
+        <div class="linea-col linea-col-del">
+            <button type="button" class="btn btn-outline-danger btn-sm btn-accion"
+                    onclick="quitarLinea(${idx})" title="Quitar">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>`;
+
+    body.appendChild(div);
+
+    initAutocomplete(
+        div.querySelector(`#ac-${idx}`),
+        PRODUCTOS,
+        ({ precio, unidad }) => {
+            document.getElementById(`precio-${idx}`).value       = precio.toFixed(2);
+            document.getElementById(`unidad-${idx}`).textContent = unidad || 'u.';
+            recalcularLinea(idx);
+        },
+        () => {
+            document.getElementById(`precio-${idx}`).value       = '0.00';
+            document.getElementById(`unidad-${idx}`).textContent = 'u.';
+            recalcularLinea(idx);
+        },
+        'precio_venta',
+        true  // ingresos: permitir seleccionar repuestos aunque tengan stock 0
+    );
+
+    actualizarUI();
+    div.querySelector('.prod-ac-input').focus();
+}
+
+function recalcularLinea(idx) {
+    const cant   = parseFloat(document.getElementById(`cant-${idx}`)?.value)  || 0;
+    const precio = parseFloat(document.getElementById(`precio-${idx}`)?.value) || 0;
+    const sub    = document.getElementById(`sub-${idx}`);
+    if (sub) sub.textContent = '$' + (cant * precio).toFixed(2);
+    recalcularTotal();
+}
+
+function recalcularTotal() {
+    let total = 0;
+    document.querySelectorAll('.linea-row').forEach(row => {
+        const idx   = row.id.replace('linea-', '');
+        const cant  = parseFloat(document.getElementById(`cant-${idx}`)?.value)  || 0;
+        const prec  = parseFloat(document.getElementById(`precio-${idx}`)?.value) || 0;
+        total += cant * prec;
+    });
+    document.getElementById('totalGeneral').textContent = '$' + total.toFixed(2);
+}
+
+function quitarLinea(idx) {
+    document.getElementById(`linea-${idx}`)?.remove();
+    recalcularTotal();
+    actualizarUI();
+}
+
+function actualizarUI() {
+    const n          = document.querySelectorAll('.linea-row').length;
+    const msg        = document.getElementById('msgSinLineas');
+    const total      = document.getElementById('totalWrapper');
+    const header     = document.querySelector('.linea-header');
+    const btnGuardar = document.getElementById('btnGuardar');
+
+    msg.style.display    = n === 0 ? '' : 'none';
+    total.style.display  = n > 0 ? '' : 'none';
+    if (header) header.style.display = n > 0 ? '' : 'none';
+    btnGuardar.disabled  = n === 0;
+}
+
+// Reset modal al abrir
+document.getElementById('modalIngreso')?.addEventListener('show.bs.modal', () => {
+    document.getElementById('lineasBody').innerHTML = '';
+    document.getElementById('totalGeneral').textContent = '$0.00';
+    const header = document.querySelector('.linea-header');
+    if (header) header.style.display = 'none';
+    lineaIdx = 0;
+    actualizarUI();
+    agregarLinea();
+});
+
+// ── MODAL DETALLE ────────────────────────────────────
+
+function verDetalle(id, proveedor) {
+    document.getElementById('detalleProveedor').textContent = proveedor;
+    document.getElementById('detalleBody').innerHTML =
+        '<div class="text-center py-4"><div class="spinner-border text-primary" role="status"></div></div>';
+
+    new bootstrap.Modal(document.getElementById('modalDetalle')).show();
+
+    fetch(`${BASE_URL}/ingresos-repuestos/detalle?id=${id}`)
+        .then(r => r.json())
+        .then(lineas => {
+            if (!lineas.length) {
+                document.getElementById('detalleBody').innerHTML =
+                    '<p class="text-muted text-center py-3">Sin repuestos registrados.</p>';
+                return;
+            }
+            let total = 0;
+            const filas = lineas.map((l, i) => {
+                const sub = parseFloat(l.subtotal);
+                total += sub;
+                return `<tr>
+                    <td class="ps-3 text-muted small">${i + 1}</td>
+                    <td>
+                        <div class="fw-semibold">${l.producto_nombre}</div>
+                        ${l.codigo ? `<div class="text-muted small">Cód: ${l.codigo}</div>` : ''}
+                    </td>
+                    <td class="text-center">
+                        <span class="badge bg-success-soft text-success">+${l.cantidad} ${l.unidad}</span>
+                    </td>
+                    <td class="text-end text-muted small">$${parseFloat(l.precio_unitario).toFixed(2)}</td>
+                    <td class="text-end fw-semibold">$${sub.toFixed(2)}</td>
+                </tr>`;
+            }).join('');
+
+            document.getElementById('detalleBody').innerHTML = `
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead class="table-light" style="font-size:.8rem;">
+                            <tr>
+                                <th class="ps-3">#</th><th>Repuesto</th>
+                                <th class="text-center">Cantidad</th>
+                                <th class="text-end">P. Unitario</th>
+                                <th class="text-end">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>${filas}</tbody>
+                        <tfoot>
+                            <tr class="table-light fw-bold">
+                                <td colspan="4" class="text-end pe-3">Total:</td>
+                                <td class="text-end">$${total.toFixed(2)}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>`;
+        })
+        .catch(() => {
+            document.getElementById('detalleBody').innerHTML =
+                '<p class="text-danger text-center py-3">Error al cargar el detalle.</p>';
+        });
+}

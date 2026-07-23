@@ -64,6 +64,13 @@ $veterinaria_id = $veterinaria_id ?? 0;
                 </a>
             </li>
 
+            <li class="<?= $activePage === 'repuestos' ? 'active' : '' ?>">
+                <a href="<?= BASE_URL ?>/repuestos">
+                    <i class="bi bi-cpu-fill"></i>
+                    <span>Repuestos</span>
+                </a>
+            </li>
+
             <li class="<?= $activePage === 'categorias' ? 'active' : '' ?>">
                 <a href="<?= BASE_URL ?>/categorias">
                     <i class="bi bi-tags-fill"></i>
@@ -75,6 +82,13 @@ $veterinaria_id = $veterinaria_id ?? 0;
                 <a href="<?= BASE_URL ?>/ingresos">
                     <i class="bi bi-box-arrow-in-down-right"></i>
                     <span>Ingresos</span>
+                </a>
+            </li>
+
+            <li class="<?= $activePage === 'ingresos-repuestos' ? 'active' : '' ?>">
+                <a href="<?= BASE_URL ?>/ingresos-repuestos">
+                    <i class="bi bi-box-arrow-in-down"></i>
+                    <span>Ingreso de repuestos</span>
                 </a>
             </li>
 

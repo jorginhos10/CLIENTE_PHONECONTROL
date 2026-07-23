@@ -50,6 +50,46 @@ switch ($uri) {
         (new AlmacenController())->toggle();
         break;
 
+    case 'repuestos':
+        require_once ROOT . '/app/controllers/RepuestoController.php';
+        (new RepuestoController())->index();
+        break;
+
+    case 'repuestos/agregar':
+        require_once ROOT . '/app/controllers/RepuestoController.php';
+        (new RepuestoController())->agregar();
+        break;
+
+    case 'repuestos/transferir':
+        require_once ROOT . '/app/controllers/RepuestoController.php';
+        (new RepuestoController())->transferir();
+        break;
+
+    case 'repuestos/toggle':
+        require_once ROOT . '/app/controllers/RepuestoController.php';
+        (new RepuestoController())->toggle();
+        break;
+
+    case 'ingresos-repuestos':
+        require_once ROOT . '/app/controllers/IngresoRepuestoController.php';
+        (new IngresoRepuestoController())->index();
+        break;
+
+    case 'ingresos-repuestos/registrar':
+        require_once ROOT . '/app/controllers/IngresoRepuestoController.php';
+        (new IngresoRepuestoController())->registrar();
+        break;
+
+    case 'ingresos-repuestos/detalle':
+        require_once ROOT . '/app/controllers/IngresoRepuestoController.php';
+        (new IngresoRepuestoController())->detalle();
+        break;
+
+    case 'ingresos-repuestos/eliminar':
+        require_once ROOT . '/app/controllers/IngresoRepuestoController.php';
+        (new IngresoRepuestoController())->eliminar();
+        break;
+
     case 'categorias':
         require_once ROOT . '/app/controllers/CategoriaController.php';
         (new CategoriaController())->index();
