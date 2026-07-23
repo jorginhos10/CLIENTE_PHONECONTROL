@@ -115,6 +115,11 @@ switch ($uri) {
         (new TecnicoController())->index();
         break;
 
+    case 'tecnicos/nuevo':
+        require_once ROOT . '/app/controllers/TecnicoController.php';
+        (new TecnicoController())->nuevo();
+        break;
+
     case 'tecnicos/guardar':
         require_once ROOT . '/app/controllers/TecnicoController.php';
         (new TecnicoController())->guardar();

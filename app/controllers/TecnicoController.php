@@ -46,6 +46,31 @@ class TecnicoController {
         $this->render('tecnicos/index', $datos);
     }
 
+    public function nuevo(): void {
+        $cuenta_id      = (int)($_SESSION['cuenta_id'] ?? 0);
+        $veterinarias   = $this->vetModel->getAll($cuenta_id);
+        $veterinaria_id = (int)($_SESSION['veterinaria_id'] ?? 0);
+        if ($veterinaria_id === 0 && !empty($veterinarias)) {
+            $veterinaria_id = (int)$veterinarias[0]['id'];
+            $_SESSION['veterinaria_id'] = $veterinaria_id;
+        }
+
+        $datos = [
+            'activePage'     => 'tecnicos',
+            'veterinaria_id' => $veterinaria_id,
+            'clientes'       => $this->clienteModel->getAll($cuenta_id),
+            'usuario'        => [
+                'nombre' => $_SESSION['usuario_nombre'],
+                'email'  => $_SESSION['usuario_email'],
+                'rol'    => $_SESSION['usuario_rol'],
+            ],
+            'error' => $_SESSION['flash_error'] ?? '',
+        ];
+        unset($_SESSION['flash_error']);
+
+        $this->render('tecnicos/nuevo', $datos);
+    }
+
     public function guardar(): void {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->redirect('tecnicos');
@@ -60,18 +85,18 @@ class TecnicoController {
 
         if (!$this->vetModel->findById($veterinaria_id, $cuenta_id)) {
             $_SESSION['flash_error'] = 'Selecciona una sucursal válida.';
-            $this->redirect('tecnicos');
+            $this->redirect('tecnicos/nuevo');
         }
 
         $cliente = $this->clienteModel->findById($cliente_id, $cuenta_id);
         if (!$cliente) {
             $_SESSION['flash_error'] = 'Selecciona un cliente válido de la lista.';
-            $this->redirect('tecnicos');
+            $this->redirect('tecnicos/nuevo');
         }
 
         if (empty($marca) || empty($modelo) || empty($falla)) {
             $_SESSION['flash_error'] = 'Fabricante, modelo y falla son obligatorios.';
-            $this->redirect('tecnicos');
+            $this->redirect('tecnicos/nuevo');
         }
 
         $accesorios = implode(',', array_filter((array)($_POST['accesorios'] ?? [])));
