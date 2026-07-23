@@ -624,6 +624,10 @@ function limpiarPatron() {
 // ── Abrir / cerrar panel (overlay propio, sin bootstrap .modal) ──
 function abrirModalReparacion() {
     document.getElementById('inp-clave-texto').value = '';
+    if (!patronInicializado) {
+        initPatron();
+        patronInicializado = true;
+    }
     limpiarPatron();
     cambiarModoClave('texto');
     document.getElementById('modalReparacion').classList.add('show');
