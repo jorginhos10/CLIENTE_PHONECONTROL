@@ -27,6 +27,13 @@ $veterinaria_id = $veterinaria_id ?? 0;
                 </a>
             </li>
 
+            <li class="<?= $activePage === 'tecnicos' ? 'active' : '' ?>">
+                <a href="<?= BASE_URL ?>/tecnicos">
+                    <i class="bi bi-person-badge-fill"></i>
+                    <span>Técnico</span>
+                </a>
+            </li>
+
             <li class="<?= $activePage === 'ventas' ? 'active' : '' ?>">
                 <a href="<?= BASE_URL ?>/ventas">
                     <i class="bi bi-bag-fill"></i>
