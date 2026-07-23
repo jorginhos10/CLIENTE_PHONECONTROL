@@ -900,67 +900,6 @@
     word-break: break-word;
 }
 
-/* ── PANEL NUEVO INGRESO (Técnico) ────────────────────── */
-/* Overlay propio (no usa .modal de Bootstrap). El scroll vive en
-   .rep-overlay (como una página normal); .rep-panel NO tiene alto
-   máximo ni flex — crece con su contenido. El header/footer quedan
-   "pegados" con position:sticky respecto a .rep-overlay, que es su
-   único ancestro con scroll real. Esto evita depender de flexbox
-   anidado + min-height:0, que es frágil entre navegadores/entornos. */
-.rep-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 1060;
-    background: rgba(15, 23, 42, .55);
-    overflow-y: auto;
-    padding: 2rem 1rem;
-    box-sizing: border-box;
-}
-
-.rep-overlay.show {
-    display: block;
-}
-
-.rep-panel {
-    background: #fff;
-    border-radius: 1rem;
-    width: 100%;
-    max-width: 700px;
-    margin: 0 auto;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, .3);
-}
-
-.rep-panel-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1.25rem 1.5rem;
-    background: #fff;
-    border-radius: 1rem 1rem 0 0;
-    position: sticky;
-    top: -2rem;
-    z-index: 2;
-}
-
-.rep-panel-footer {
-    padding: 1rem 1.5rem;
-    background: #fff;
-    border-top: 1px solid #eef1f6;
-    border-radius: 0 0 1rem 1rem;
-    display: flex;
-    justify-content: flex-end;
-    gap: .5rem;
-    position: sticky;
-    bottom: -2rem;
-    z-index: 2;
-}
-
-.rep-panel-body {
-    padding: 1.25rem 1.5rem;
-    background: #f8fafc;
-}
-
 /* Secciones tipo tarjeta dentro del formulario */
 .form-section {
     background: #fff;
