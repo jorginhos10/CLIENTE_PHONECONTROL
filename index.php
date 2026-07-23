@@ -70,6 +70,26 @@ switch ($uri) {
         (new ClienteController())->index();
         break;
 
+    case 'tecnicos':
+        require_once ROOT . '/app/controllers/TecnicoController.php';
+        (new TecnicoController())->index();
+        break;
+
+    case 'tecnicos/guardar':
+        require_once ROOT . '/app/controllers/TecnicoController.php';
+        (new TecnicoController())->guardar();
+        break;
+
+    case 'tecnicos/estado':
+        require_once ROOT . '/app/controllers/TecnicoController.php';
+        (new TecnicoController())->avanzarEstado();
+        break;
+
+    case 'tecnicos/eliminar':
+        require_once ROOT . '/app/controllers/TecnicoController.php';
+        (new TecnicoController())->eliminar();
+        break;
+
     case 'deudas':
         require_once ROOT . '/app/controllers/DeudaController.php';
         (new DeudaController())->index();
