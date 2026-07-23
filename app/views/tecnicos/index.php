@@ -281,12 +281,38 @@
                         </div>
 
                         <div class="col-12">
-                            <label class="form-label fw-semibold">Clave o patrón de desbloqueo</label>
-                            <div class="input-group">
-                                <input type="password" class="form-control" name="clave_equipo" id="inp-clave-equipo" placeholder="PIN o contraseña alfanumérica">
-                                <button type="button" class="btn btn-outline-secondary" onclick="mostrarClave()">
-                                    <i class="bi bi-eye" id="icono-clave"></i>
-                                </button>
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label class="form-label fw-semibold mb-0">Clave o patrón de desbloqueo</label>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <button type="button" class="btn btn-outline-secondary active" id="btn-modo-texto" onclick="cambiarModoClave('texto')" title="Contraseña">
+                                        <i class="bi bi-fonts"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary" id="btn-modo-patron" onclick="cambiarModoClave('patron')" title="Patrón">
+                                        <i class="bi bi-grid-3x3-gap-fill"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <input type="hidden" name="clave_equipo" id="inp-clave-equipo-hidden">
+
+                            <div id="clave-modo-texto">
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="inp-clave-texto" placeholder="PIN o contraseña alfanumérica" oninput="sincronizarClaveTexto()">
+                                    <button type="button" class="btn btn-outline-secondary" onclick="mostrarClave()">
+                                        <i class="bi bi-eye" id="icono-clave"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div id="clave-modo-patron" class="d-none">
+                                <div class="text-center small text-muted mb-2" id="patron-resumen">Dibuja el patrón de desbloqueo</div>
+                                <svg id="patron-svg" viewBox="0 0 240 240" width="220" height="220"
+                                     class="mx-auto d-block" style="touch-action:none; cursor:pointer; max-width:100%;"></svg>
+                                <div class="text-center mt-2">
+                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="limpiarPatron()">
+                                        <i class="bi bi-arrow-counterclockwise me-1"></i>Borrar patrón
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -404,7 +430,7 @@ document.getElementById('buscador').addEventListener('input', function () {
 });
 
 function mostrarClave() {
-    const inp  = document.getElementById('inp-clave-equipo');
+    const inp  = document.getElementById('inp-clave-texto');
     const icon = document.getElementById('icono-clave');
     if (inp.type === 'password') {
         inp.type = 'text';
@@ -414,6 +440,161 @@ function mostrarClave() {
         icon.className = 'bi bi-eye';
     }
 }
+
+function sincronizarClaveTexto() {
+    document.getElementById('inp-clave-equipo-hidden').value = document.getElementById('inp-clave-texto').value;
+}
+
+// ── Modo texto / patrón ───────────────────────────────
+function cambiarModoClave(modo) {
+    const btnTexto  = document.getElementById('btn-modo-texto');
+    const btnPatron = document.getElementById('btn-modo-patron');
+    const divTexto  = document.getElementById('clave-modo-texto');
+    const divPatron = document.getElementById('clave-modo-patron');
+
+    if (modo === 'texto') {
+        btnTexto.classList.add('active');
+        btnPatron.classList.remove('active');
+        divTexto.classList.remove('d-none');
+        divPatron.classList.add('d-none');
+        sincronizarClaveTexto();
+    } else {
+        btnPatron.classList.add('active');
+        btnTexto.classList.remove('active');
+        divPatron.classList.remove('d-none');
+        divTexto.classList.add('d-none');
+        if (!patronInicializado) {
+            initPatron();
+            patronInicializado = true;
+        }
+        guardarPatron();
+    }
+}
+
+// ── Patrón de desbloqueo (grid 3x3 estilo Android) ────
+const patronDots = [];
+(function construirDots() {
+    const coords = [40, 120, 200];
+    let num = 1;
+    for (let r = 0; r < 3; r++) {
+        for (let c = 0; c < 3; c++) {
+            patronDots.push({ num: num++, cx: coords[c], cy: coords[r] });
+        }
+    }
+})();
+
+let patronSeleccion   = [];
+let patronDibujando   = false;
+let patronInicializado = false;
+
+function initPatron() {
+    const svg = document.getElementById('patron-svg');
+    svg.innerHTML = '';
+
+    const gLines = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    gLines.setAttribute('id', 'patron-lines');
+    svg.appendChild(gLines);
+
+    patronDots.forEach(d => {
+        const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        c.setAttribute('cx', d.cx);
+        c.setAttribute('cy', d.cy);
+        c.setAttribute('r', 18);
+        c.setAttribute('fill', '#e2e8f0');
+        c.setAttribute('data-num', d.num);
+        c.classList.add('patron-dot');
+        svg.appendChild(c);
+
+        const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        t.setAttribute('x', d.cx);
+        t.setAttribute('y', d.cy + 5);
+        t.setAttribute('text-anchor', 'middle');
+        t.setAttribute('font-size', '13');
+        t.setAttribute('fill', '#475569');
+        t.setAttribute('pointer-events', 'none');
+        t.classList.add('patron-label');
+        t.textContent = d.num;
+        svg.appendChild(t);
+    });
+
+    svg.addEventListener('pointerdown', e => {
+        patronDibujando = true;
+        patronSeleccion = [];
+        actualizarPatronVisual();
+        manejarPuntoPatron(e);
+    });
+    svg.addEventListener('pointermove', e => {
+        if (patronDibujando) manejarPuntoPatron(e);
+    });
+    window.addEventListener('pointerup', () => {
+        if (patronDibujando) { patronDibujando = false; guardarPatron(); }
+    });
+}
+
+function manejarPuntoPatron(e) {
+    const svg     = document.getElementById('patron-svg');
+    const rect    = svg.getBoundingClientRect();
+    const scaleX  = 240 / rect.width;
+    const scaleY  = 240 / rect.height;
+    const x = (e.clientX - rect.left) * scaleX;
+    const y = (e.clientY - rect.top)  * scaleY;
+
+    patronDots.forEach(d => {
+        const dist = Math.hypot(d.cx - x, d.cy - y);
+        if (dist < 22 && !patronSeleccion.includes(d.num)) {
+            patronSeleccion.push(d.num);
+            actualizarPatronVisual();
+        }
+    });
+}
+
+function actualizarPatronVisual() {
+    const svg = document.getElementById('patron-svg');
+
+    svg.querySelectorAll('.patron-dot').forEach(c => {
+        const activo = patronSeleccion.includes(parseInt(c.dataset.num));
+        c.setAttribute('fill', activo ? '#7c3aed' : '#e2e8f0');
+    });
+    svg.querySelectorAll('.patron-label').forEach((t, i) => {
+        t.setAttribute('fill', patronSeleccion.includes(i + 1) ? '#fff' : '#475569');
+    });
+
+    const gLines = document.getElementById('patron-lines');
+    gLines.innerHTML = '';
+    for (let i = 0; i < patronSeleccion.length - 1; i++) {
+        const a = patronDots.find(d => d.num === patronSeleccion[i]);
+        const b = patronDots.find(d => d.num === patronSeleccion[i + 1]);
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', a.cx);
+        line.setAttribute('y1', a.cy);
+        line.setAttribute('x2', b.cx);
+        line.setAttribute('y2', b.cy);
+        line.setAttribute('stroke', '#7c3aed');
+        line.setAttribute('stroke-width', 4);
+        line.setAttribute('stroke-linecap', 'round');
+        gLines.appendChild(line);
+    }
+
+    document.getElementById('patron-resumen').textContent = patronSeleccion.length
+        ? 'Patrón guardado: ' + patronSeleccion.join(' ')
+        : 'Dibuja el patrón de desbloqueo';
+}
+
+function guardarPatron() {
+    document.getElementById('inp-clave-equipo-hidden').value = patronSeleccion.join('-');
+}
+
+function limpiarPatron() {
+    patronSeleccion = [];
+    actualizarPatronVisual();
+    guardarPatron();
+}
+
+document.getElementById('modalReparacion')?.addEventListener('show.bs.modal', () => {
+    document.getElementById('inp-clave-texto').value = '';
+    limpiarPatron();
+    cambiarModoClave('texto');
+});
 
 function calcularSaldo() {
     const costo     = parseFloat(document.getElementById('inp-costo-total').value) || 0;
