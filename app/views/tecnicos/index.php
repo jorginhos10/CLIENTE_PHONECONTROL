@@ -212,7 +212,7 @@
 
 <!-- ── MODAL NUEVO INGRESO ───────────────────────────── -->
 <div class="modal fade" id="modalReparacion" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content border-0 shadow">
             <form method="POST" action="<?= BASE_URL ?>/tecnicos/guardar" id="formReparacion">
                 <input type="hidden" name="veterinaria_id" value="<?= $veterinaria_id ?>">
@@ -504,17 +504,6 @@ function initPatron() {
         c.setAttribute('data-num', d.num);
         c.classList.add('patron-dot');
         svg.appendChild(c);
-
-        const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        t.setAttribute('x', d.cx);
-        t.setAttribute('y', d.cy + 5);
-        t.setAttribute('text-anchor', 'middle');
-        t.setAttribute('font-size', '13');
-        t.setAttribute('fill', '#475569');
-        t.setAttribute('pointer-events', 'none');
-        t.classList.add('patron-label');
-        t.textContent = d.num;
-        svg.appendChild(t);
     });
 
     svg.addEventListener('pointerdown', e => {
@@ -554,9 +543,6 @@ function actualizarPatronVisual() {
     svg.querySelectorAll('.patron-dot').forEach(c => {
         const activo = patronSeleccion.includes(parseInt(c.dataset.num));
         c.setAttribute('fill', activo ? '#7c3aed' : '#e2e8f0');
-    });
-    svg.querySelectorAll('.patron-label').forEach((t, i) => {
-        t.setAttribute('fill', patronSeleccion.includes(i + 1) ? '#fff' : '#475569');
     });
 
     const gLines = document.getElementById('patron-lines');

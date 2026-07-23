@@ -899,3 +899,24 @@
     font-weight: 500;
     word-break: break-word;
 }
+
+/* ── MODAL REPARACIÓN (Técnico) ─────────────────────── */
+/* Cap explícito de alto + scroll interno en .modal-content (no en
+   .modal-dialog): con modal-dialog-centered, el min-height que
+   Bootstrap calcula ahí puede ganarle a un max-height propio y
+   anular el límite (regla CSS: min-height > max-height ⇒ gana min-height). */
+#modalReparacion.modal {
+    padding-top: 3vh;
+}
+
+#modalReparacion .modal-content {
+    max-height: 90vh !important;
+    display: flex;
+    flex-direction: column;
+}
+
+#modalReparacion .modal-body {
+    overflow-y: auto !important;
+    flex: 1 1 auto;
+    min-height: 0;
+}
